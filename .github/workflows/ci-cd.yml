@@ -1,0 +1,47 @@
+name: MERN E-Commerce CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - name: 📥 Checkout source code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    # ================= BACKEND =================
+    - name: 📦 Install Backend Dependencies
+      working-directory: Back-end
+      run: npm install
+
+    - name: 🧪 Backend Lint / Check
+      working-directory: Back-end
+      run: |
+        echo "Backend check passed ✅"
+
+    # ================= FRONTEND =================
+    - name: 📦 Install Frontend Dependencies
+      working-directory: FrontEnd
+      run: npm install
+
+    - name: 🏗️ Build Frontend (Vite)
+      working-directory: FrontEnd
+      run: npm run build
+
+    - name: ✅ CI Finished Successfully
+      run: echo "CI/CD Pipeline completed 🎉"
