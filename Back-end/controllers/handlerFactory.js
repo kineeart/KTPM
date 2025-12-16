@@ -329,41 +329,44 @@ exports.getAll = (Model) =>
 exports.getTable = (Model) =>
   catchAsync(async (req, res, next) => {
     let filter = {};
-    let searchStr = req.query.search["value"];
+    let searchStr = req.query?.search?.value;
+
     if (searchStr) {
-      // filter.push({ title: regex });
       filter["$text"] = { $search: searchStr };
     }
-    if (Model == User) filter["role"] = { $ne: "admin" };
 
-    Model.count({}, function (err, c) {
-      const recordsTotal = c;
-      Model.count(filter, function (err, c) {
-        const recordsFiltered = c;
+    if (Model.modelName === "User") {
+      filter["role"] = { $ne: "admin" };
+    }
+
+    Model.countDocuments({}, function (err, recordsTotal) {
+      if (err) return next(err);
+
+      Model.countDocuments(filter, function (err, recordsFiltered) {
+        if (err) return next(err);
+
         Model.find(
           filter,
           {},
           {
             sort: { _id: -1 },
-            skip: Number(req.query.start),
-            limit: Number(req.query.length),
+            skip: Number(req.query.start || 0),
+            limit: Number(req.query.length || 10),
           },
           function (err, results) {
-            if (err) {
-              return;
-            }
-            const data = {
-              draw: req.query.draw,
-              recordsFiltered: recordsFiltered,
-              recordsTotal: recordsTotal,
+            if (err) return next(err);
+
+            res.status(200).json({
+              recordsTotal,
+              recordsFiltered,
               data: results,
-            };
-            res.status(200).json(data);
+            });
           }
         );
       });
     });
   });
+
 exports.checkPermission = (Model) =>
   catchAsync(async (req, res, next) => {
     // 1) Get review id from param and findById to get review information
