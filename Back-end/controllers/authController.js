@@ -263,13 +263,16 @@ exports.isLoggedIn = async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    // roles ['admin', 'employee',[user]]. role='user'
-    if (req.user == undefined || !roles.includes(req.user.role)) {
-      return next(new AppError("Bạn không có quyền thực hiện", 403));
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have permission"
+      });
     }
     next();
   };
 };
+
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email

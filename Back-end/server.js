@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
-dotenv.config({ path: "./config.env" });
+dotenv.config({
+  path: process.env.NODE_ENV === "test" ? ".env.test" : "config.env",
+});
 
 const app = require("./app");
 const initDatabase = require("./utils/initDatabase");
@@ -23,6 +25,9 @@ mongoose
   .catch((err) => console.log("❌ DB connection error:", err));
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`🚀 App running on port ${port}...`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`🚀 App running on port ${port}...`);
+  });
+}
+

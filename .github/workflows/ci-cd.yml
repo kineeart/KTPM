@@ -18,11 +18,15 @@ jobs:
     - name: 📥 Checkout source code
       uses: actions/checkout@v4
 
-    - name: 🟢 Setup Node.js
+   - name: 🟢 Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: |
+          Back-end/package-lock.json
+          FrontEnd/package-lock.json
+
 
     # ================= BACKEND =================
     - name: 📦 Install Backend Dependencies
