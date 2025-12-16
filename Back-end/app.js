@@ -97,6 +97,14 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    port: process.env.PORT,
+    env: process.env.NODE_ENV,
+  });
+});
+
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/categories", categoryRouter);
@@ -108,6 +116,8 @@ app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/payments", transactionRouter);
 app.use("/api/v1/locations", locationRouter);
 app.use("/", viewRouter);
+//_____________________________________________
+
 
 app.all("*", (req, res, next) => {
   // next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
